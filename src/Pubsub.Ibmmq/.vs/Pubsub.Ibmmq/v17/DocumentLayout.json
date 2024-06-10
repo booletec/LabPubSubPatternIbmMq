@@ -1,0 +1,149 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Workspace\\Labs\\ibmmq\\Pubsub.Ibmmq\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{25867742-5174-4DBD-9E74-CEC4F33A387C}|..\\Ibmmq.Core\\Ibmmq.Core.csproj|c:\\workspace\\labs\\ibmmq\\ibmmq.core\\infra\\subscription.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25867742-5174-4DBD-9E74-CEC4F33A387C}|..\\Ibmmq.Core\\Ibmmq.Core.csproj|c:\\workspace\\labs\\ibmmq\\ibmmq.core\\infra\\ibmmq\\ibmmqeventbus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30069844-AD31-4A31-93EF-76BBC8E3F6B4}|Producer.Ibmmq.csproj|c:\\workspace\\labs\\ibmmq\\pubsub.ibmmq\\worker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{30069844-AD31-4A31-93EF-76BBC8E3F6B4}|Producer.Ibmmq.csproj|solutionrelative:worker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30BF334C-125A-4EC5-A872-6453F4691EF4}|..\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj|c:\\workspace\\labs\\ibmmq\\consumer.ibmmq\\worker.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25867742-5174-4DBD-9E74-CEC4F33A387C}|..\\Ibmmq.Core\\Ibmmq.Core.csproj|c:\\workspace\\labs\\ibmmq\\ibmmq.core\\domain\\handlers\\mqreceivedhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25867742-5174-4DBD-9E74-CEC4F33A387C}|..\\Ibmmq.Core\\Ibmmq.Core.csproj|c:\\workspace\\labs\\ibmmq\\ibmmq.core\\domain\\events\\mqreceivedevent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30BF334C-125A-4EC5-A872-6453F4691EF4}|..\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj|c:\\workspace\\labs\\ibmmq\\consumer.ibmmq\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{30BF334C-125A-4EC5-A872-6453F4691EF4}|..\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj|c:\\workspace\\labs\\ibmmq\\consumer.ibmmq\\consumer.ibmmq.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Subscription.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Infra\\Subscription.cs",
+              "RelativeDocumentMoniker": "..\\Ibmmq.Core\\Infra\\Subscription.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Infra\\Subscription.cs",
+              "RelativeToolTip": "..\\Ibmmq.Core\\Infra\\Subscription.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T04:22:36.027Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Worker.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Pubsub.Ibmmq\\Worker.cs",
+              "RelativeDocumentMoniker": "Worker.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Pubsub.Ibmmq\\Worker.cs",
+              "RelativeToolTip": "Worker.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAQwAoAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T03:50:50.233Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MqReceivedEvent.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Domain\\Events\\MqReceivedEvent.cs",
+              "RelativeDocumentMoniker": "..\\Ibmmq.Core\\Domain\\Events\\MqReceivedEvent.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Domain\\Events\\MqReceivedEvent.cs",
+              "RelativeToolTip": "..\\Ibmmq.Core\\Domain\\Events\\MqReceivedEvent.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAuwAQAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T03:38:08.799Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Program.cs",
+              "RelativeDocumentMoniker": "..\\Consumer.Ibmmq\\Program.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Program.cs",
+              "RelativeToolTip": "..\\Consumer.Ibmmq\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T03:28:48.542Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Worker.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Worker.cs",
+              "RelativeDocumentMoniker": "..\\Consumer.Ibmmq\\Worker.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Worker.cs",
+              "RelativeToolTip": "..\\Consumer.Ibmmq\\Worker.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAQwBcAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T03:21:26.791Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Consumer.Ibmmq",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj",
+              "RelativeDocumentMoniker": "..\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj",
+              "RelativeToolTip": "..\\Consumer.Ibmmq\\Consumer.Ibmmq.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-06-10T03:21:10.048Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MqReceivedHandler.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Domain\\Handlers\\MqReceivedHandler.cs",
+              "RelativeDocumentMoniker": "..\\Ibmmq.Core\\Domain\\Handlers\\MqReceivedHandler.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Domain\\Handlers\\MqReceivedHandler.cs",
+              "RelativeToolTip": "..\\Ibmmq.Core\\Domain\\Handlers\\MqReceivedHandler.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-10T03:18:37.83Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IbmmqEventBus.cs",
+              "DocumentMoniker": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Infra\\Ibmmq\\IbmmqEventBus.cs",
+              "RelativeDocumentMoniker": "..\\Ibmmq.Core\\Infra\\Ibmmq\\IbmmqEventBus.cs",
+              "ToolTip": "C:\\Workspace\\Labs\\ibmmq\\Ibmmq.Core\\Infra\\Ibmmq\\IbmmqEventBus.cs",
+              "RelativeToolTip": "..\\Ibmmq.Core\\Infra\\Ibmmq\\IbmmqEventBus.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAEQAAAAsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-09T18:45:58.928Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

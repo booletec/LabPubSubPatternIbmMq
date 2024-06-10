@@ -1,0 +1,12 @@
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\bin\Debug\net8.0\Ibmmq.Core.deps.json
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\bin\Debug\net8.0\Ibmmq.Core.dll
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\bin\Debug\net8.0\Ibmmq.Core.pdb
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.csproj.AssemblyReference.cache
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.AssemblyInfoInputs.cache
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.AssemblyInfo.cs
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.csproj.CoreCompileInputs.cache
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.dll
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\refint\Ibmmq.Core.dll
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\Ibmmq.Core.pdb
+C:\Workspace\Labs\ibmmq\Ibmmq.Core\obj\Debug\net8.0\ref\Ibmmq.Core.dll
