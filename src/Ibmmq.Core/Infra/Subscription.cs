@@ -3,27 +3,19 @@ using System.Text.Json;
 
 namespace Ibmmq.Core.Conectors
 {
-    internal class Subscription
+    internal class Subscription(Type handlerType, Type eventType)
     {
 
-        public Type HandlerType { get; }
-        public Type EventType { get; }
+        public Type HandlerType { get; } = handlerType;
+        public Type EventType { get; } = eventType;
 
-        public Subscription(Type handlerType, Type eventType)
-        {
-            HandlerType = handlerType;
-            EventType = eventType;
-        }
-
-        public async Task Handle(string message, IServiceScope scope)
+        public async Task Handle(string message, IServiceScope? scope)
         {
             var eventData = JsonSerializer.Deserialize(message, EventType);
-            var concreteType = typeof(IEventHandler<>).MakeGenericType(EventType);
+            var concreteType = typeof(IEventHandler<>).MakeGenericType(EventType) ?? throw new Exception("Handler for this event not implemented yet");
+            var handler = scope?.ServiceProvider.GetRequiredService(concreteType);
 
-            if (concreteType is null) throw new Exception("Handler for this event not implemented yet");
-            var handler = scope.ServiceProvider.GetRequiredService(concreteType);
-
-            await (Task)concreteType.GetMethod("Handle").Invoke(handler, [eventData]);
+            await (Task)concreteType.GetMethod("Handle")?.Invoke(handler, [eventData]);
 
         }
 

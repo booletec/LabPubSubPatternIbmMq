@@ -4,21 +4,13 @@ using Ibmmq.Core.Domain.Handlers;
 
 namespace Consumer.Ibmmq
 {
-    public class Worker : BackgroundService
+    public class Worker(ILogger<Worker> logger,
+        IServiceProvider provider) : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
-        private readonly IServiceProvider _provider;
+        private readonly ILogger<Worker> _logger = logger;
+        private readonly IServiceProvider _provider = provider;
 
-        public Worker(ILogger<Worker> logger, 
-            IServiceProvider provider) 
-        {
-            _logger = logger;
-            _provider = provider;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-        }
+        protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.CompletedTask;
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {

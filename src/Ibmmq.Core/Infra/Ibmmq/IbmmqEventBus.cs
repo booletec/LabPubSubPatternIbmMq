@@ -9,7 +9,7 @@ namespace Ibmmq.Core.Conectors.Ibmmq
         private readonly string _queueManagerName;
         private readonly string _queueName;
         private readonly EventBusSubscriptionManager _evSubscriptionManager;
-        private IServiceProvider? _provider;
+        private readonly IServiceProvider? _provider;
 
         public IbmMqEventBus(IbmMqOptions options, IServiceProvider provider)
         {
@@ -40,47 +40,49 @@ namespace Ibmmq.Core.Conectors.Ibmmq
             while (true)
             {
                 using MQQueueManager queueManager = new(_queueManagerName);
-                using (var queue = queueManager.AccessQueue(_queueName, MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_FAIL_IF_QUIESCING))
+                using var queue = queueManager.AccessQueue(_queueName, MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_FAIL_IF_QUIESCING);
+                try
                 {
-                    try
+                    var mqMessage = new MQMessage();
+
+                    queue.Get(mqMessage, new MQGetMessageOptions
                     {
-                        var mqMessage = new MQMessage();
+                        WaitInterval = 500,
+                        Options = MQC.MQGMO_WAIT + MQC.MQGMO_SYNCPOINT
+                    });
 
-                        queue.Get(mqMessage, new MQGetMessageOptions
-                        {
-                            WaitInterval = 500,
-                            Options = MQC.MQGMO_WAIT + MQC.MQGMO_SYNCPOINT
-                        });
+                    var message = mqMessage.ReadString(mqMessage.DataLength);
 
-                        var message = mqMessage.ReadString(mqMessage.DataLength);
-
-                        var @event = new MqReceivedEvent(message)
-                        {
-                            MqId = System.Text.Encoding.Default.GetString(mqMessage.MessageId),
-                            CorrelationId = System.Text.Encoding.Default.GetString(mqMessage.CorrelationId)
-                        };
-
-                        if (ProcessEvent(nameof(MqReceivedEvent), System.Text.Json.JsonSerializer.Serialize(@event)).GetAwaiter().GetResult())
-                            queueManager.Commit();
-
-                    }
-                    catch (MQException e)
+                    var @event = new MqReceivedEvent(message)
                     {
-                        if (e.Reason != 2033) throw;
-                    }
-                   
+                        MqId = System.Text.Encoding.Default.GetString(mqMessage.MessageId),
+                        CorrelationId = System.Text.Encoding.Default.GetString(mqMessage.CorrelationId)
+                    };
+
+                    if (ProcessEvent(nameof(MqReceivedEvent), System.Text.Json.JsonSerializer.Serialize(@event), Get_provider()).GetAwaiter().GetResult())
+                        queueManager.Commit();
+
+                }
+                catch (MQException e)
+                {
+                    if (e.Reason != 2033) throw;
                 }
             }
         }
 
-        private async Task<bool> ProcessEvent(string eventName, string message)
+        private IServiceProvider? Get_provider()
+        {
+            return _provider;
+        }
+
+        private async Task<bool> ProcessEvent(string eventName, string message, IServiceProvider? _provider)
         {
             var processed = false;
 
             if (_evSubscriptionManager.HasSubscriptions(eventName))
             {
 
-                using (var scope = _provider.CreateAsyncScope())
+                using (var scope = _provider?.CreateAsyncScope())
                 {
                     var subscriptions = _evSubscriptionManager.GetHandlers(eventName);
                     foreach (var subscription in subscriptions)
@@ -99,15 +101,13 @@ namespace Ibmmq.Core.Conectors.Ibmmq
             // Crie e configure o objeto MQQueueManager
             using MQQueueManager queueManager = new(_queueManagerName);
             // Acesse a fila desejada
-            using (var queue = queueManager.AccessQueue(_queueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING))
-            {
-                // Crie uma mensagem para enviar
-                var message = new MQMessage();
-                message.WriteString(@event.Payload);
+            using var queue = queueManager.AccessQueue(_queueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING);
+            // Crie uma mensagem para enviar
+            var message = new MQMessage();
+            message.WriteString(@event.Payload);
 
-                // Envie a mensagem para a fila
-                queue.Put(message);
-            }
+            // Envie a mensagem para a fila
+            queue.Put(message);
         }
 
         public void Subscribe<TEvent, THandler>()
@@ -125,7 +125,7 @@ namespace Ibmmq.Core.Conectors.Ibmmq
         }
         protected virtual void Dispose(bool disposing) => _evSubscriptionManager.Clear();
 
-        private void ConfigureEnvironment(IbmMqOptions options)
+        private static void ConfigureEnvironment(IbmMqOptions options)
         {
             MQEnvironment.Hostname = options.Host;
             MQEnvironment.Port = options.Port;
