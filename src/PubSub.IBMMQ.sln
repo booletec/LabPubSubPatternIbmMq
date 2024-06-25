@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.IBMMQ", "MassTransit.IBMMQ\MassTransit.IBMMQ.csproj", "{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{25867742-5174-4DBD-9E74-CEC4F33A387C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25867742-5174-4DBD-9E74-CEC4F33A387C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25867742-5174-4DBD-9E74-CEC4F33A387C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +56,7 @@ Global
 		{30069844-AD31-4A31-93EF-76BBC8E3F6B4} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
 		{30BF334C-125A-4EC5-A872-6453F4691EF4} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
 		{25867742-5174-4DBD-9E74-CEC4F33A387C} = {64A1EA7F-4528-4CCC-9A02-B685F2A452B5}
+		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92DA9C23-0564-42EA-833E-42DB9BBF9F8C}

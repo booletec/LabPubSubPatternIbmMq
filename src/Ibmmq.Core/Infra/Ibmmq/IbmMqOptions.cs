@@ -8,6 +8,5 @@ namespace Ibmmq.Core.Conectors.Ibmmq
                                [Required] string Host,
                                [Required] int Port,
                                [Required] string UserName,
-                               [Required] string Password
-                               );
+                               [Required] string Password);
 }

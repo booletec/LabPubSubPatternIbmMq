@@ -1,6 +1,8 @@
 ﻿using IBM.WMQ;
 using Ibmmq.Core.Domain.Events;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text;
+using System.Text.Json;
 
 namespace Ibmmq.Core.Conectors.Ibmmq
 {
@@ -9,7 +11,7 @@ namespace Ibmmq.Core.Conectors.Ibmmq
         private readonly string _queueManagerName;
         private readonly string _queueName;
         private readonly EventBusSubscriptionManager _evSubscriptionManager;
-        private readonly IServiceProvider? _provider;
+        private readonly IServiceProvider _provider;
 
         public IbmMqEventBus(IbmMqOptions options, IServiceProvider provider)
         {
@@ -17,26 +19,13 @@ namespace Ibmmq.Core.Conectors.Ibmmq
 
             _queueManagerName = options.QueueManagerName;
             _queueName = options.QueueName;
-
-            ConfigureEnvironment(options);
             _provider = provider;
 
-        }
-
-        public IbmMqEventBus(IbmMqOptions options)
-        {
-            _evSubscriptionManager = new EventBusSubscriptionManager();
-
-            _queueManagerName = options.QueueManagerName;
-            _queueName = options.QueueName;
-
             ConfigureEnvironment(options);
-
         }
 
-        public void StartListener()
+        public async Task StartListener()
         {
-
             while (true)
             {
                 using MQQueueManager queueManager = new(_queueManagerName);
@@ -55,24 +44,18 @@ namespace Ibmmq.Core.Conectors.Ibmmq
 
                     var @event = new MqReceivedEvent(message)
                     {
-                        MqId = System.Text.Encoding.Default.GetString(mqMessage.MessageId),
-                        CorrelationId = System.Text.Encoding.Default.GetString(mqMessage.CorrelationId)
+                        MqId = Encoding.Default.GetString(mqMessage.MessageId),
+                        CorrelationId = Encoding.Default.GetString(mqMessage.CorrelationId)
                     };
 
-                    if (ProcessEvent(nameof(MqReceivedEvent), System.Text.Json.JsonSerializer.Serialize(@event), Get_provider()).GetAwaiter().GetResult())
+                    if (await ProcessEvent(nameof(MqReceivedEvent), JsonSerializer.Serialize(@event), _provider))
                         queueManager.Commit();
-
                 }
                 catch (MQException e)
                 {
                     if (e.Reason != 2033) throw;
                 }
             }
-        }
-
-        private IServiceProvider? Get_provider()
-        {
-            return _provider;
         }
 
         private async Task<bool> ProcessEvent(string eventName, string message, IServiceProvider? _provider)
@@ -123,6 +106,7 @@ namespace Ibmmq.Core.Conectors.Ibmmq
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         protected virtual void Dispose(bool disposing) => _evSubscriptionManager.Clear();
 
         private static void ConfigureEnvironment(IbmMqOptions options)
@@ -132,8 +116,6 @@ namespace Ibmmq.Core.Conectors.Ibmmq
             MQEnvironment.Channel = options.ChannelName;
             MQEnvironment.UserId = options.UserName;
             MQEnvironment.Password = options.Password;
-
         }
-
     }
 }
