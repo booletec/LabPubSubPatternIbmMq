@@ -4,6 +4,7 @@ namespace Ibmmq.Core.Conectors.Ibmmq
 {
     public record IbmMqOptions([Required] string QueueManagerName,
                                [Required] string QueueName,
+                               [Required] string ReportQueueName,
                                [Required] string ChannelName,
                                [Required] string Host,
                                [Required] int Port,

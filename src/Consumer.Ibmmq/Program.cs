@@ -6,7 +6,7 @@ using Ibmmq.Core.Domain.Handlers;
 var builder = Host.CreateApplicationBuilder(args);
 builder
     .Services
-    .AddSingleton<IEventHandler<MqReceivedEvent>, MqReceivedHandler>()
+    .AddSingleton<IEventHandler<EventMessage>, MqReceivedHandler>()
     .AddHostedService<Worker>();
 
 var host = builder.Build();

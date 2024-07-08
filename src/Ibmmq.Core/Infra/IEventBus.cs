@@ -3,6 +3,7 @@
     internal interface IEventBus : IDisposable
     {
         void Publish(Event @event);
+        Task<string> PublishAsync(Event @event);
 
         void Subscribe<TEvent, THandler>()
             where TEvent : Event

@@ -2,10 +2,7 @@
 {
     internal class EventBusSubscriptionManager
     {
-
         private readonly IDictionary<string, List<Subscription>> _eventHandlers;
-
-
         public bool IsEmpty => _eventHandlers.Keys.Any();
 
         public event EventHandler<string>? OnEventRemoved;

@@ -2,12 +2,14 @@
 
 namespace Ibmmq.Core.Domain.Events
 {
-    public class MqReceivedEvent : Event
+    public class EventMessage : Event
     {
-        public MqReceivedEvent(string? payload) : base(payload)
+        public EventMessage(string? payload) : base(payload)
         {
         }
 
+        public bool IsCoa { get; set; }
+        public bool IsCod { get; set; }
         public string? MqId { get; set; }
         public string? CorrelationId { get; set; }
     }
