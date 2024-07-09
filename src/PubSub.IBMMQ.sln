@@ -21,10 +21,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{17A63B6C-6ADE-44DC-B9CF-FBE4F605B525}"
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
+		docker-compose.yaml = docker-compose.yaml
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.IBMMQ", "MassTransit.IBMMQ\MassTransit.IBMMQ.csproj", "{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.IBMMQ", "MassTransit.IBMMQ\MassTransit.IBMMQ.csproj", "{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Producer.RabbitMQ", "Producer.RabbitMQ\Producer.RabbitMQ.csproj", "{BE475084-645E-4597-A3F9-FA5E62938171}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer.RabbitMQ", "Consumer.RabbitMQ\Consumer.RabbitMQ.csproj", "{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +53,14 @@ Global
 		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE475084-645E-4597-A3F9-FA5E62938171}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE475084-645E-4597-A3F9-FA5E62938171}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE475084-645E-4597-A3F9-FA5E62938171}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE475084-645E-4597-A3F9-FA5E62938171}.Release|Any CPU.Build.0 = Release|Any CPU
+		{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +70,8 @@ Global
 		{30BF334C-125A-4EC5-A872-6453F4691EF4} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
 		{25867742-5174-4DBD-9E74-CEC4F33A387C} = {64A1EA7F-4528-4CCC-9A02-B685F2A452B5}
 		{2C07A65A-8CD6-406F-9E25-8A827D86EEC6} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
+		{BE475084-645E-4597-A3F9-FA5E62938171} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
+		{351BFB0A-D009-479A-A4DA-0CC2D7A3E1CE} = {F98B422D-1AF0-41F0-8242-03AE109D0855}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92DA9C23-0564-42EA-833E-42DB9BBF9F8C}
