@@ -2,49 +2,70 @@ using Ibmmq.Core.Conectors.Ibmmq;
 using Ibmmq.Core.Domain.Events;
 using Ibmmq.Core.Domain.Handlers;
 
-namespace Consumer.Ibmmq
+namespace Consumer.Ibmmq;
+
+public class Worker(IServiceProvider provider, ILogger<Worker> logger) : BackgroundService
 {
-    public class Worker(ILogger<Worker> logger,
-        IServiceProvider provider) : BackgroundService
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.CompletedTask;
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        private readonly ILogger<Worker> _logger = logger;
-        private readonly IServiceProvider _provider = provider;
+        logger.LogInformation("Inicializando o CONSUMIDOR em: {time}", DateTimeOffset.Now);
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.CompletedTask;
+        // Configurações para o primeiro listener da fila de entrada
+        var options = new IbmMqOptions(
+            QueueManagerName: "QM1",
+            QueueName: "DEV.QUEUE.1",
+            ReportQueueName: "DEV.QUEUE.2",
+            ChannelName: "DEV.APP.SVRCONN",
+            Host: "127.0.0.1",
+            Port: 1414,
+            UserName: "app",
+            Password: "passw0rd");
 
-        public override Task StartAsync(CancellationToken cancellationToken)
+        var bus = new IbmMqEventBus(options, provider);
+        bus.Subscribe<ReceivedMessage, MqReceivedHandler>();
+
+        // Configurações para o segundo listener da fila de respostas.
+        var optionsCOA = new IbmMqOptions(
+            QueueManagerName: "QM1",
+            QueueName: "DEV.QUEUE.2",
+            ReportQueueName: "DEV.QUEUE.2",
+            ChannelName: "DEV.APP.SVRCONN",
+            Host: "127.0.0.1",
+            Port: 1414,
+            UserName: "app",
+            Password: "passw0rd");
+
+        var busCOA = new IbmMqEventBus(optionsCOA, provider);
+        busCOA.Subscribe<ReportedMessage, MqReceivedHandler>();
+
+        // Inicializa ambos os listeners em paralelo e loga mensagens apropriadas
+        var listenForReceivedMessagesQueue = Task.Run(async () =>
         {
+            await bus.Listen<ReceivedMessage>();
+            logger.LogInformation("INICIANDO SUBSCRIBE PARA A QUEUE DE ENTRADA EM {time}", DateTimeOffset.Now);
+        }, cancellationToken);
 
-            _logger.LogInformation("Inicializando o Consumer em: {time}", DateTimeOffset.Now);
-            var options = new IbmMqOptions(
-                        QueueManagerName: "QM1",
-                        QueueName: "DEV.QUEUE.2",
-                        //ReportQueueName: "DEV.QUEUE.2",
-                        ChannelName: "DEV.APP.SVRCONN",
-                        Host: "127.0.0.1",
-                        Port: 1414,
-                        UserName: "app",
-                        Password: "passw0rd");
+        var listenForReportedMessagesQueue = Task.Run(async () =>
+        {
+            await busCOA.Listen<ReportedMessage>();
+            logger.LogInformation("INICIANDO SUBSCRIBE PARA A QUEUE DE REPORT EM {time}", DateTimeOffset.Now);
+        }, cancellationToken);
 
-            var bus = new IbmMqEventBus(options, _provider);
-            bus.Subscribe<EventMessage, MqReceivedHandler>();
-            bus.StartListener();
-
-            //var optionsCOA = new IbmMqOptions(
-            //           QueueManagerName: "QM1",
-            //           QueueName: "DEV.QUEUE.2",
-            //           ReportQueueName: "DEV.QUEUE.2",
-            //           ChannelName: "DEV.APP.SVRCONN",
-            //           Host: "127.0.0.1",
-            //           Port: 1414,
-            //           UserName: "app",
-            //           Password: "passw0rd");
-
-            //var busCOA = new IbmMqEventBus(optionsCOA, _provider);
-            //busCOA.Subscribe<MqReceivedEvent, MqReceivedHandler>();
-            //busCOA.StartListener();
-
-            return base.StartAsync(cancellationToken);
+        try
+        {
+            // Aguarda ambos os listeners serem iniciados
+            await Task.WhenAll(listenForReceivedMessagesQueue, listenForReportedMessagesQueue);
         }
+        catch (Exception ex)
+        {
+            logger.LogError("Erro ao iniciar os listeners: {message}", ex.Message);
+            throw;
+        }
+
+        // Aguarda a base StartAsync
+        await base.StartAsync(cancellationToken);
     }
+
 }

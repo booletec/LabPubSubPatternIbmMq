@@ -5,7 +5,6 @@ namespace Ibmmq.Core.Conectors
 {
     internal class Subscription(Type handlerType, Type eventType)
     {
-
         public Type HandlerType { get; } = handlerType;
         public Type EventType { get; } = eventType;
 
