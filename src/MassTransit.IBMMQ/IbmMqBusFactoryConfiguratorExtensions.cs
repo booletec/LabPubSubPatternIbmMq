@@ -33,5 +33,5 @@ public interface IIbmMqHostConfigurator
     void Channel(string channel);
     void UserId(string userId);
     void Password(string password);
-    void Config(IbmMqOptions config);
+    void Config(IbmMqTransportConfiguration config);
 }

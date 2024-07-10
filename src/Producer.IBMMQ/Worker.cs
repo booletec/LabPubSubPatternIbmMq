@@ -1,5 +1,5 @@
 using Ibmmq.Core.Conectors.Ibmmq;
-using Ibmmq.Core.Domain.Events;
+using IBMMQ.Core.Infra.Abstractions;
 
 namespace Pubsub.Ibmmq;
 
@@ -13,7 +13,7 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         {
             if (logger.IsEnabled(LogLevel.Information))
             {
-                var options = new IbmMqOptions(
+                var options = new IbmMqTransportConfiguration(
                    QueueManagerName: "QM1",
                    QueueName: "DEV.QUEUE.1",
                    ReportQueueName: "DEV.QUEUE.2",
@@ -24,7 +24,7 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
                    Password: "passw0rd");
 
                 var bus = new IbmMqEventBus(options);
-                var messageId = await bus.PublishAsync(new EventMessage { Payload = "Payment done!" });
+                var messageId = await bus.PublishAsync(new Event { Payload = "Payment done!" });
                 logger.LogInformation("Mensagem publicada em: {time} com id {messageId}", DateTimeOffset.Now, messageId);
             }
 

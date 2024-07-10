@@ -1,6 +1,4 @@
-﻿using Ibmmq.Core.Conectors;
-using Ibmmq.Core.Domain.Events;
-using Microsoft.Extensions.DependencyInjection;
+﻿using IBMMQ.Core.Infra.Abstractions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -8,39 +6,35 @@ using System.Text.Json;
 
 namespace IBMMQ.Core.Infra.RabbitMq
 {
-    public class RabbitMqEventBus : IEventBus, IDisposable
+    public class RabbitMqEventBus : EventBus
     {
-        private readonly EventBusSubscriptionManager _evSubscriptionManager;
-        private readonly RabbitMqOptions _options;
-        private readonly IServiceProvider? _provider;
+        private readonly RabbitMqTransportConfiguration _configuration;
         private readonly IConnection _rabbitMqConnection;
         private readonly IModel _rabbitMqChannel;
 
         public RabbitMqEventBus(
-            RabbitMqOptions options,
-            IServiceProvider? provider = null)
+            RabbitMqTransportConfiguration _configuration,
+            IServiceProvider? provider = null) : base(provider)
         {
-            _evSubscriptionManager = new EventBusSubscriptionManager();
-            _options = options;
-            _provider = provider;
+            this._configuration = _configuration;
 
             var factory = new ConnectionFactory
             {
-                HostName = options.Host,
-                UserName = options.UserName,
-                Password = options.Password,
-                Port = options.Port
+                HostName = _configuration.Host,
+                UserName = _configuration.UserName,
+                Password = _configuration.Password,
+                Port = _configuration.Port
             };
 
             _rabbitMqConnection = factory.CreateConnection();
             _rabbitMqChannel = _rabbitMqConnection.CreateModel();
         }
 
-        public Task Listen<TEvent>() where TEvent : EventMessage, new()
+        public override Task Listen<TEvent>() 
         {
             return Task.Run(() =>
             {
-                _rabbitMqChannel.QueueDeclare(queue: _options.QueueName,
+                _rabbitMqChannel.QueueDeclare(queue: _configuration.QueueName,
                                              durable: true,
                                              exclusive: false,
                                              autoDelete: false,
@@ -59,69 +53,37 @@ namespace IBMMQ.Core.Infra.RabbitMq
 
                     var payload = JsonSerializer.Serialize(@event);
                     if (await ProcessEvent(typeof(TEvent).Name, payload, _provider))
-                    {
                         _rabbitMqChannel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                    }
                 };
 
-                _rabbitMqChannel.BasicConsume(queue: _options.QueueName,
+                _rabbitMqChannel.BasicConsume(queue: _configuration.QueueName,
                                              autoAck: false,
                                              consumer: consumer);
             });
         }
 
-        public void Publish(Event @event)
+        public override void Publish(Event @event)
         {
             var body = Encoding.UTF8.GetBytes(@event.Payload);
 
             _rabbitMqChannel.BasicPublish(exchange: "",
-                                          routingKey: _options.QueueName,
+                                          routingKey: _configuration.QueueName,
                                           basicProperties: null,
                                           body: body);
         }
 
-        public Task<string> PublishAsync(Event @event)
+        public override Task<string> PublishAsync(Event @event)
         {
             Publish(@event);
-            return Task.FromResult(Guid.NewGuid().ToString());
+            return Task.FromResult(@event.Id.ToString());
         }
 
-        private async Task<bool> ProcessEvent(string eventName, string message, IServiceProvider? _provider)
-        {
-            var processed = false;
-
-            if (_evSubscriptionManager.HasSubscriptions(eventName))
-            {
-                using (var scope = _provider?.CreateAsyncScope())
-                {
-                    var subscriptions = _evSubscriptionManager.GetHandlers(eventName);
-                    foreach (var subscription in subscriptions)
-                        await subscription.Handle(message, scope);
-                }
-                processed = true;
-            }
-            return processed;
-        }
-
-        public void Subscribe<TEvent, THandler>()
-           where TEvent : Event
-           where THandler : IEventHandler<TEvent> => _evSubscriptionManager.AddSubscription<TEvent, THandler>();
-
-        public void Unsubscribe<TEvent, THandler>()
-            where TEvent : Event
-            where THandler : IEventHandler<TEvent> => _evSubscriptionManager.RemoveSubscription<TEvent, THandler>();
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             _evSubscriptionManager.Clear();
             _rabbitMqChannel?.Dispose();
             _rabbitMqConnection?.Dispose();
+            base.Dispose(disposing);
         }
 
     }

@@ -1,45 +1,39 @@
-﻿using Ibmmq.Core.Conectors;
-using Ibmmq.Core.Domain.Events;
+﻿using Ibmmq.Core.Domain.Events;
+using IBMMQ.Core.Infra.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace Ibmmq.Core.Domain.Handlers
+namespace Ibmmq.Core.Domain.Handlers;
+
+public class MqReceivedHandler(ILogger<MqReceivedHandler> logguer) : 
+    IEventHandler<ReceivedMessage>,
+    IEventHandler<ReportedMessage>
 {
-    public class MqReceivedHandler : 
-        IEventHandler<ReceivedMessage>,
-        IEventHandler<ReportedMessage>
+  
+    public async Task Handle(ReceivedMessage @event)
     {
-        private readonly ILogger<MqReceivedHandler> _logguer;
-
-        public MqReceivedHandler(ILogger<MqReceivedHandler> logguer)
+        try
         {
-            _logguer = logguer;
+            logguer.LogInformation("Mensagem de ENTRADA: {mensagem}", JsonSerializer.Serialize(@event));
+            await Task.FromResult(0);
         }
-        public async Task Handle(ReceivedMessage @event)
+        catch (Exception)
         {
-            try
-            {
-                _logguer.LogInformation("Mensagem de ENTRADA: {mensagem}", JsonSerializer.Serialize(@event));
-                await Task.FromResult(0);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-           
+            throw;
         }
+       
+    }
 
-        public async Task Handle(ReportedMessage @event)
+    public async Task Handle(ReportedMessage @event)
+    {
+        try
         {
-            try
-            {
-                _logguer.LogInformation("Mensagem de REPORT: {mensagem}", JsonSerializer.Serialize(@event));
-                await Task.FromResult(0);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            logguer.LogInformation("Mensagem de REPORT: {mensagem}", JsonSerializer.Serialize(@event));
+            await Task.FromResult(0);
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 }

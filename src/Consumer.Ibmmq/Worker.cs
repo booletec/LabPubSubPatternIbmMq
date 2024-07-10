@@ -13,7 +13,7 @@ public class Worker(IServiceProvider provider, ILogger<Worker> logger) : Backgro
         logger.LogInformation("Inicializando o CONSUMIDOR em: {time}", DateTimeOffset.Now);
 
         // Configurações para o primeiro listener da fila de entrada
-        var options = new IbmMqOptions(
+        var options = new IbmMqTransportConfiguration(
             QueueManagerName: "QM1",
             QueueName: "DEV.QUEUE.1",
             ReportQueueName: "DEV.QUEUE.2",
@@ -27,7 +27,7 @@ public class Worker(IServiceProvider provider, ILogger<Worker> logger) : Backgro
         bus.Subscribe<ReceivedMessage, MqReceivedHandler>();
 
         // Configurações para o segundo listener da fila de respostas.
-        var optionsCOA = new IbmMqOptions(
+        var optionsCOA = new IbmMqTransportConfiguration(
             QueueManagerName: "QM1",
             QueueName: "DEV.QUEUE.2",
             ReportQueueName: "DEV.QUEUE.2",

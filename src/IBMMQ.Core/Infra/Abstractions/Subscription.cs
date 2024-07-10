@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 
-namespace Ibmmq.Core.Conectors
+namespace IBMMQ.Core.Infra.Abstractions
 {
-    internal class Subscription(Type handlerType, Type eventType)
+    public class Subscription(Type handlerType, Type eventType)
     {
         public Type HandlerType { get; } = handlerType;
         public Type EventType { get; } = eventType;

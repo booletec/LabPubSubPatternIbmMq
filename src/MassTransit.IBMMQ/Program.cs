@@ -68,6 +68,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
                         h.Config(new IbmMqOptions(
                             QueueManagerName: "QM1",
                             QueueName: "DEV.QUEUE.2",
+                            ReportQueueName: "DEV.QUEUE.2",
                             ChannelName: "DEV.APP.SVRCONN",
                             Host: "127.0.0.1",
                             Port: 1414,

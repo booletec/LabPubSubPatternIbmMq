@@ -1,15 +1,15 @@
-﻿namespace Ibmmq.Core.Conectors
+﻿namespace IBMMQ.Core.Infra.Abstractions
 {
-    internal class EventBusSubscriptionManager
+    public class EventBusSubscriptionManager
     {
-        private readonly IDictionary<string, List<Subscription>> _eventHandlers;
-        public bool IsEmpty => _eventHandlers.Keys.Any();
+        private readonly Dictionary<string, List<Subscription>> _eventHandlers;
+        public bool IsEmpty => _eventHandlers.Keys.Count != 0;
 
         public event EventHandler<string>? OnEventRemoved;
 
         public event EventHandler<string>? OnEventAdded;
 
-        public EventBusSubscriptionManager() => _eventHandlers = new Dictionary<string, List<Subscription>>();
+        public EventBusSubscriptionManager() => _eventHandlers = [];
 
         public void AddSubscription<TEvent, THandler>()
             where TEvent : Event
@@ -20,7 +20,7 @@
 
         public void Clear() => _eventHandlers.Clear();
 
-        public string GetEventKey<TEvent>() => typeof(TEvent).Name;
+        public static string GetEventKey<TEvent>() => typeof(TEvent).Name;
 
         public IEnumerable<Subscription> GetHandlers<TEvent>() where TEvent : Event
         {
@@ -38,11 +38,9 @@
             var subsToRemove = GetSubscriptionToRemove(eventName, typeof(THandler));
 
             if (subsToRemove != null)
-            {
                 RemoveSubscription(eventName, subsToRemove);
-            }
-        }
 
+        }
 
         void AddSubscription(Type handlerType, string eventName, Type eventType)
         {
@@ -54,7 +52,7 @@
 
             if (_eventHandlers[eventName].Any(s => s.HandlerType == handlerType))
                 throw new ArgumentException($"Handler {handlerType.Name} already register for '{eventName}'", nameof(handlerType));
-            
+
             _eventHandlers[eventName].Add(Subscription.Create(handlerType, eventType));
         }
 
@@ -63,7 +61,7 @@
             if (subsToRemove != null)
             {
                 _eventHandlers[eventName].Remove(subsToRemove);
-                if (!_eventHandlers[eventName].Any())
+                if (_eventHandlers[eventName].Count == 0)
                 {
                     _eventHandlers.Remove(eventName);
                     OnEventRemoved?.Invoke(this, eventName);

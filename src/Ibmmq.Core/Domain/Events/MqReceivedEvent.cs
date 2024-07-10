@@ -1,21 +1,12 @@
-﻿using Ibmmq.Core.Conectors;
+﻿using IBMMQ.Core.Infra.Abstractions;
 
 namespace Ibmmq.Core.Domain.Events
 {
-    public class EventMessage : Event
-    {
-      
-        public bool IsCoa { get; set; }
-        public bool IsCod { get; set; }
-        public string? MqId { get; set; }
-        public string? CorrelationId { get; set; }
-    }
-
-    public class ReceivedMessage : EventMessage
+    public class ReceivedMessage : Event
     {
     }
 
-    public class ReportedMessage : EventMessage
+    public class ReportedMessage : Event
     {
     }
 }

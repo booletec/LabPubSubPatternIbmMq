@@ -1,115 +1,96 @@
 ﻿using IBM.WMQ;
-using Ibmmq.Core.Domain.Events;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using IBMMQ.Core.Infra.Abstractions;
 using System.Text.Json;
 
 namespace Ibmmq.Core.Conectors.Ibmmq
 {
-    public class IbmMqEventBus : IEventBus
+    public class IbmMqEventBus : EventBus
     {
-        private readonly EventBusSubscriptionManager _evSubscriptionManager;
-        private readonly IbmMqOptions _options;
-        private readonly IServiceProvider? _provider;
-
-        public IbmMqEventBus(
-            IbmMqOptions options, 
-            IServiceProvider? provider = null)
+        private readonly IbmMqTransportConfiguration _transportConfiguration;
+        public IbmMqEventBus(IbmMqTransportConfiguration transportConfiguration, IServiceProvider? provider = null) 
+            : base(provider)
         {
-            _evSubscriptionManager = new EventBusSubscriptionManager();
-            _options = options;
-           
-            ConfigureEnvironment(options);
-            _provider = provider;
+            _transportConfiguration = transportConfiguration;
+            ConfigureEnvironment(transportConfiguration);
         }
 
-        public Task Listen<TEvent>() where TEvent : EventMessage, new()
+        public override Task Listen<TEvent>()
         {
             while (true)
             {
-                using (MQQueueManager queueManager = new(_options.QueueManagerName))
+                using MQQueueManager queueManager = new(_transportConfiguration.QueueManagerName);
+                using var queue = queueManager.AccessQueue(_transportConfiguration.QueueName, MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_FAIL_IF_QUIESCING | MQC.MQOO_INQUIRE);
+                try
                 {
-                    using (var queue = queueManager.AccessQueue(_options.QueueName, MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_FAIL_IF_QUIESCING | MQC.MQOO_INQUIRE))
+                    var CoaConstants = new int[] { MQC.MQFB_COA, MQC.MQRO_COA, MQC.MQRO_COA_WITH_DATA, MQC.MQRO_COA_WITH_FULL_DATA };
+                    var CodConstants = new int[] { MQC.MQFB_COD, MQC.MQRO_COD, MQC.MQRO_COD_WITH_DATA, MQC.MQRO_COD_WITH_FULL_DATA };
+
+                    var mqMessage = new MQMessage();
+
+                    queue.Get(mqMessage, new MQGetMessageOptions
                     {
-                        try
-                        {
-                            var CoaConstants = new int[] { MQC.MQFB_COA, MQC.MQRO_COA, MQC.MQRO_COA_WITH_DATA, MQC.MQRO_COA_WITH_FULL_DATA };
-                            var CodConstants = new int[] { MQC.MQFB_COD, MQC.MQRO_COD, MQC.MQRO_COD_WITH_DATA, MQC.MQRO_COD_WITH_FULL_DATA };
+                        WaitInterval = 500,
+                        Options = MQC.MQGMO_WAIT | MQC.MQGMO_SYNCPOINT
+                    });
 
-                            var mqMessage = new MQMessage();
+                    var message = string.Empty;
+                    if (mqMessage.DataLength > 0)
+                        message = mqMessage.ReadString(mqMessage.DataLength);
 
-                            queue.Get(mqMessage, new MQGetMessageOptions
-                            {
-                                WaitInterval = 500,
-                                Options = MQC.MQGMO_WAIT | MQC.MQGMO_SYNCPOINT
-                            });
+                    var @event = new TEvent
+                    {
+                        Payload = message,
+                        IsCoa = CoaConstants.Any(coa => coa == mqMessage.Feedback),
+                        IsCod = CodConstants.Any(cod => cod == mqMessage.Feedback),
+                        MqId = GetHexString(mqMessage.MessageId),
+                        CorrelationId = GetHexString(mqMessage.CorrelationId)
+                    };
 
-                            var message = string.Empty;
-                            if (mqMessage.DataLength > 0)
-                                message = mqMessage.ReadString(mqMessage.DataLength);
-
-                            var @event = new TEvent
-                            {
-                                Payload = message,
-                                IsCoa = CoaConstants.Any(coa => coa == mqMessage.Feedback),
-                                IsCod = CodConstants.Any(cod => cod == mqMessage.Feedback),
-                                MqId = GetHexString(mqMessage.MessageId),
-                                CorrelationId = GetHexString(mqMessage.CorrelationId)
-                            };
-
-                            var payload = JsonSerializer.Serialize(@event);
-                            if (ProcessEvent(typeof(TEvent).Name, payload, _provider).GetAwaiter().GetResult())
-                                queueManager.Commit();
-                            else
-                                queueManager.Backout();
-                        }
-                        catch (MQException e)
-                        {
-                            if (e.Reason != MQC.MQRC_NO_MSG_AVAILABLE) throw;
-                        }
-                        catch (Exception) { throw; }
-                    }
+                    var payload = JsonSerializer.Serialize(@event);
+                    if (ProcessEvent(typeof(TEvent).Name, payload, _provider).GetAwaiter().GetResult())
+                        queueManager.Commit();
+                    else
+                        queueManager.Backout();
                 }
+                catch (MQException e)
+                {
+                    if (e.Reason != MQC.MQRC_NO_MSG_AVAILABLE) throw;
+                }
+                catch (Exception) { throw; }
             }
         }
 
-        public void Publish(Event @event)
+        public override void Publish(Event @event)
         {
             // Crie e configure o objeto MQQueueManager
-            using (MQQueueManager queueManager = new(_options.QueueManagerName))
-            {
-                using (var queue = queueManager.AccessQueue(_options.QueueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING))
-                {
-                    // Acesse a fila desejada
+            using MQQueueManager queueManager = new(_transportConfiguration.QueueManagerName);
+            using var queue = queueManager.AccessQueue(_transportConfiguration.QueueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING);
+            // Acesse a fila desejada
 
-                    // Crie uma mensagem para enviar
-                    var message = new MQMessage();
-                    message.WriteString(@event.Payload);
+            // Crie uma mensagem para enviar
+            var message = new MQMessage();
+            message.WriteString(@event.Payload);
 
-                    message.Report = MQC.MQRO_COA | MQC.MQRO_COD | MQC.MQRO_PASS_CORREL_ID;
+            message.Report = MQC.MQRO_COA | MQC.MQRO_COD | MQC.MQRO_PASS_CORREL_ID;
 
-                    //message.MessageType = MQC.MQMT_REQUEST;
-                    if (!string.IsNullOrWhiteSpace(_options.ReportQueueName))
-                        //message.ReplyToQueueManagerName = _queueManagerName;
-                        message.ReplyToQueueName = _options.ReportQueueName;
+            //message.MessageType = MQC.MQMT_REQUEST;
+            if (!string.IsNullOrWhiteSpace(_transportConfiguration.ReportQueueName))
+                //message.ReplyToQueueManagerName = _queueManagerName;
+                message.ReplyToQueueName = _transportConfiguration.ReportQueueName;
 
-                    // Envie a mensagem para a fila
-                    queue.Put(message);
-                }
-            }
-              
+            // Envie a mensagem para a fila
+            queue.Put(message);
+
         }
 
-       
-        public Task<string> PublishAsync(Event @event)
+        public override Task<string> PublishAsync(Event @event)
         {
-
             try
             {
                 // Crie e configure o objeto MQQueueManager
-                using MQQueueManager queueManager = new(_options.QueueManagerName);
+                using MQQueueManager queueManager = new(_transportConfiguration.QueueManagerName);
                 // Acesse a fila desejada
-                using var queue = queueManager.AccessQueue(_options.QueueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING);
+                using var queue = queueManager.AccessQueue(_transportConfiguration.QueueName, MQC.MQOO_OUTPUT | MQC.MQOO_FAIL_IF_QUIESCING);
                 // Crie uma mensagem para enviar
                 var message = new MQMessage();
                 message.WriteString(@event.Payload);
@@ -117,81 +98,32 @@ namespace Ibmmq.Core.Conectors.Ibmmq
 
                 message.MessageId = Guid.NewGuid().ToByteArray();
                 //message.MessageType = MQC.MQMT_REQUEST;
-                if (!string.IsNullOrWhiteSpace(_options.ReportQueueName))
+                if (!string.IsNullOrWhiteSpace(_transportConfiguration.ReportQueueName))
                     //message.ReplyToQueueManagerName = _queueManagerName;
-                    message.ReplyToQueueName = _options.ReportQueueName;
+                    message.ReplyToQueueName = _transportConfiguration.ReportQueueName;
                 // Envie a mensagem para a fila
                 queue.Put(message);
 
                 var mqId = GetHexString(message.MessageId);
                 return Task.FromResult(mqId);
             }
-            catch (MQException mqEx)
+            catch (MQException)
             {
-                Console.WriteLine($"Erro MQException: {mqEx.ReasonCode} - {mqEx.Message}");
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Erro Exception: {ex.Message}");
                 throw;
             }
-           
-
         }
-
-        private async Task<bool> ProcessEvent(string eventName, string message, IServiceProvider? _provider)
+        private static string GetHexString(byte[] b) => BitConverter.ToString(b).Replace("-", "");
+        private static void ConfigureEnvironment(IbmMqTransportConfiguration configuration)
         {
-            var processed = false;
-
-            if (_evSubscriptionManager.HasSubscriptions(eventName))
-            {
-                using (var scope = _provider?.CreateAsyncScope())
-                {
-                    var subscriptions = _evSubscriptionManager.GetHandlers(eventName);
-                    foreach (var subscription in subscriptions)
-                        await subscription.Handle(message, scope);
-                }
-                processed = true;
-            }
-            return processed;
-        }
-
-        public void Subscribe<TEvent, THandler>()
-           where TEvent : Event
-           where THandler : IEventHandler<TEvent> => _evSubscriptionManager.AddSubscription<TEvent, THandler>();
-
-        public void Unsubscribe<TEvent, THandler>()
-            where TEvent : Event
-            where THandler : IEventHandler<TEvent> => _evSubscriptionManager.RemoveSubscription<TEvent, THandler>();
-
-
-        private static string GetHexString(byte[] b)
-        {
-            //string result = "";
-            //for (int i = 0; i < b.Length; i++)
-            //    result += ((b[i] & 0xff) + 0x100).ToString("X2").Substring(1);
-            
-            //return result;
-
-            return BitConverter.ToString(b).Replace("-", "");
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing) => _evSubscriptionManager.Clear();
-
-        private static void ConfigureEnvironment(IbmMqOptions options)
-        {
-            MQEnvironment.Hostname = options.Host;
-            MQEnvironment.Port = options.Port;
-            MQEnvironment.Channel = options.ChannelName;
-            MQEnvironment.UserId = options.UserName;
-            MQEnvironment.Password = options.Password;
+            MQEnvironment.Hostname = configuration.Host;
+            MQEnvironment.Port = configuration.Port;
+            MQEnvironment.Channel = configuration.ChannelName;
+            MQEnvironment.UserId = configuration.UserName;
+            MQEnvironment.Password = configuration.Password;
         }
     }
 }

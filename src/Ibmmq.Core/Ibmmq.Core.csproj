@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.301.64" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.301.29" />
     <PackageReference Include="IBMMQDotnetClient" Version="9.3.5.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />

@@ -1,7 +1,7 @@
 using Consumer.RabbitMQ;
-using Ibmmq.Core.Conectors;
 using Ibmmq.Core.Domain.Events;
 using Ibmmq.Core.Domain.Handlers;
+using IBMMQ.Core.Infra.Abstractions;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services
